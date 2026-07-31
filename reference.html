@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SCD Analysis Studioで採用している計算式と参考文献の一覧">
+  <title>REFERENCE | SCD Analysis Studio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header reference-header">
+    <div>
+      <p class="eyebrow">SCD Analysis Studio</p>
+      <h1>REFERENCE</h1>
+    </div>
+    <div class="header-actions">
+      <div class="site-menu">
+        <button id="siteMenuButton" class="hamburger-button" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="siteMenuPanel"><span></span><span></span><span></span></button>
+        <nav id="siteMenuPanel" class="site-menu-panel hidden" aria-label="サイトメニュー">
+          <a href="index.html">ANALYSIS</a>
+          <a class="active" href="reference.html">REFERENCE</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-shell reference-page">
+    <section id="visual-reference" class="reference-section">
+      <div class="reference-section-heading"><p class="eyebrow">VISUAL ANALYSIS</p><h2>視覚分析</h2></div>
+      <div class="reference-list">
+        <article class="card reference-item">
+          <h3>Trend（最小二乗法）</h3>
+          <p class="reference-summary"><strong>何を見る方法か：</strong>各フェーズにおけるトレンド（傾き）を，最小二乗法で求め，データが上がっているのか下がっているのか，維持しているのかを確認します．</p>
+          <p class="reference-summary"><strong>結果の見方：</strong>各フェーズのトレンドを視覚的に比較して，どちらの方が上がっているのか，下がっているのかを確認します．外れ値の影響を大きく受けるため注意が必要です．</p>
+          <details class="reference-formula-details"><summary>計算式を表示</summary><div class="formula-block"><span>Slope</span><code>b₁ = Σ[(xᵢ−x̄)(yᵢ−ȳ)] / Σ[(xᵢ−x̄)²]</code><span>Intercept</span><code>b₀ = ȳ − b₁x̄</code><span>Regression</span><code>Ŷ = b₀ + b₁X</code></div></details>
+          <h4>参考文献</h4>
+          <ol class="citation-list"><li>Manolov R. Linear Trend in Single-Case Visual and Quantitative Analyses. <em>Behavior Modification</em>. 2018;42(5):684–706. <a href="https://doi.org/10.1177/0145445517726301" target="_blank" rel="noopener noreferrer">doi:10.1177/0145445517726301</a></li><li>竹林由武．認知行動療法研究シングルケース実験デザインにおける介入の有効性評価．<em>認知行動療法研究</em>．2022;48(2):145–154. <a href="https://doi.org/10.24468/jjbct.21-024" target="_blank" rel="noopener noreferrer">doi:10.24468/jjbct.21-024</a></li></ol>
+        </article>
+
+        <article class="card reference-item">
+          <h3>Trend（Theil–Sen法）</h3>
+          <p class="reference-summary"><strong>何を見る方法か：</strong>各フェーズにおけるトレンド（傾き）を，Theil–Sen法で求め，データが上がっているのか下がっているのか，維持しているのかを確認します．</p>
+          <p class="reference-summary"><strong>結果の見方：</strong>プロットのペアを通るすべての線の傾きの中央値からトレンドを求め，どのフェーズで上がっているのか，下がっているのかを確認します．外れ値に強いロバスト（堅牢・頑健）な手法です．</p>
+          <details class="reference-formula-details"><summary>計算式を表示</summary><div class="formula-block"><span>Slope</span><code>b₁ = median{(yⱼ−yᵢ)/(xⱼ−xᵢ) : xⱼ≠xᵢ}</code><span>Intercept</span><code>b₀ = median(yᵢ−b₁xᵢ)</code><span>Regression</span><code>Ŷ = b₀ + b₁X</code></div></details>
+          <p class="reference-note">同じX値をもつ2点の組み合わせは，傾きを求められないため除外します．</p>
+          <h4>参考文献</h4>
+          <ol class="citation-list"><li>Sen PK. Estimates of the Regression Coefficient Based on Kendall's Tau. <em>Journal of the American Statistical Association</em>. 1968;63(324):1379–1389. <a href="https://doi.org/10.1080/01621459.1968.10480934" target="_blank" rel="noopener noreferrer">doi:10.1080/01621459.1968.10480934</a></li><li>竹林由武．認知行動療法研究シングルケース実験デザインにおける介入の有効性評価．<em>認知行動療法研究</em>．2022;48(2):145–154. <a href="https://doi.org/10.24468/jjbct.21-024" target="_blank" rel="noopener noreferrer">doi:10.24468/jjbct.21-024</a></li></ol>
+        </article>
+
+        <article class="card reference-item">
+          <h3>2SD法</h3>
+          <p class="reference-summary"><strong>何を見る方法か：</strong>ベースライン期のばらつき（標準偏差の2倍の値：2SD）を基準にして，介入期の値がそのばらつきを越えているかを確認します．</p>
+          <p class="reference-summary"><strong>結果の見方：</strong>2SDよりも改善方向に越えるデータが多いほど，ベースラインのばらつきという言葉では説明できない（改善している）と考えます．</p>
+          <details class="reference-formula-details"><summary>計算式を表示</summary><div class="formula-block"><span>標準偏差</span><code>sₐ = √[Σ(yᵢ−ȳₐ)²/(nₐ−1)]</code><span>上限・下限</span><code>ȳₐ ± 2sₐ</code></div></details>
+          <h4>参考文献</h4>
+          <ol class="citation-list"><li>Gottman JM, Leiblum SR. <em>How to Do Psychotherapy and How to Evaluate It: A Manual for Beginners</em>. New York: Holt, Rinehart and Winston; 1974.</li><li>Nourbakhsh MR, Ottenbacher KJ. The Statistical Analysis of Single-Subject Data: A Comparative Examination. <em>Physical Therapy</em>. 1994;74(8):768–776. <a href="https://doi.org/10.1093/ptj/74.8.768" target="_blank" rel="noopener noreferrer">doi:10.1093/ptj/74.8.768</a></li><li>竹林由武．認知行動療法研究シングルケース実験デザインにおける介入の有効性評価．<em>認知行動療法研究</em>．2022;48(2):145–154. <a href="https://doi.org/10.24468/jjbct.21-024" target="_blank" rel="noopener noreferrer">doi:10.24468/jjbct.21-024</a></li></ol>
+        </article>
+
+        <article class="card reference-item">
+          <h3>Celeration Line（中央分割法）</h3>
+          <p class="reference-summary"><strong>何を見る方法か：</strong>まず，ベースライン期のデータを前半と後半に分け，それぞれの中央値を求めます（中央分割法）．前半と後半の中央値を結んだCeleration Lineを介入期にも延長することで，ベースライン期を続けていた場合の予測値を算出します．</p>
+          <p class="reference-summary"><strong>結果の見方：</strong>ベースライン期から介入期に延長されたCeleration Line上の予測値と介入期の実測値を二項検定などを用いて比較して効果を確認します．</p>
+          <details class="reference-formula-details"><summary>計算式を表示</summary><div class="formula-block"><span>中央値座標</span><code>P₁ = (median X前半，median Y前半)，P₂ = (median X後半，median Y後半)</code><span>傾き</span><code>b₁ = (P₂ᵧ−P₁ᵧ)/(P₂ₓ−P₁ₓ)</code><span>切片</span><code>b₀ = P₁ᵧ−b₁P₁ₓ</code><span>二項検定</span><code>P(X ≥ k) = Σᵢ₌ₖⁿ C(n，i)(0.5)ⁱ(0.5)ⁿ⁻ⁱ</code></div></details>
+          <h4>参考文献</h4>
+          <ol class="citation-list"><li>White OR, Haring NG. <em>Exceptional Teaching: A Multimedia Training Package</em>. 2nd ed. Columbus, OH: Charles E. Merrill; 1980.</li><li>Ottenbacher KJ. Analysis of Data in Idiographic Research: Issues and Methods. <em>American Journal of Physical Medicine &amp; Rehabilitation</em>. 1992;71(4):202–208. <a href="https://doi.org/10.1097/00002060-199208000-00002" target="_blank" rel="noopener noreferrer">doi:10.1097/00002060-199208000-00002</a></li><li>山田剛史．シングルケースデザインの統計分析．<em>行動分析学研究</em>．2015;29(Suppl):219–232. <a href="https://doi.org/10.24456/jjba.29.Suppl_219" target="_blank" rel="noopener noreferrer">doi:10.24456/jjba.29.Suppl_219</a></li></ol>
+        </article>
+
+        <article class="card reference-item">
+          <h3>VAIOR（Visual Aid Implying an Objective Rule）</h3>
+          <p class="reference-summary"><strong>何を見る方法か：</strong>Theil–Sen法で求めたベースライン期の回帰直線のトレンドと中央絶対偏差から基準線を作成し，それをもとにした基準値を超えているかを確認します．</p>
+          <p class="reference-summary"><strong>結果の見方：</strong>全体の効果は，ベースライン期で上下の基準線を越えたデータの割合を求め，その2倍を判定基準値とします．介入期で改善側の基準線を越えた割合が判定基準値を上回れば，全体の効果ありと判定します．即時効果は，介入期の最初の3点がすべて改善側の基準線を越えた場合に効果ありと判定します．漸進または遅延効果は，介入期の最後の3点がすべて改善側の基準線を越えた場合に効果ありと判定します．</p>
+          <details class="reference-formula-details"><summary>計算式を表示</summary><div class="formula-block"><span>トレンド</span><code>Ŷₐ(X) = Theil–Sen trend</code><span>中央絶対偏差</span><code>MADᵣ = median(|Yₐ−Ŷₐ|)</code><span>基準線</span><code>Ŷₐ(X) ± MADᵣ</code><span>全体効果の判定基準値</span><code>2 × [A期の基準線外データ数 / nₐ]</code></div></details>
+          <h4>参考文献</h4>
+          <ol class="citation-list"><li>Manolov R, Vannest KJ. A Visual Aid and Objective Rule Encompassing the Data Features of Visual Analysis. <em>Behavior Modification</em>. 2023;47(6):1345–1376. Epub 2019 Jun 5. <a href="https://doi.org/10.1177/0145445519854323" target="_blank" rel="noopener noreferrer">doi:10.1177/0145445519854323</a></li><li>竹林由武．認知行動療法研究シングルケース実験デザインにおける介入の有効性評価．<em>認知行動療法研究</em>．2022;48(2):145–154. <a href="https://doi.org/10.24468/jjbct.21-024" target="_blank" rel="noopener noreferrer">doi:10.24468/jjbct.21-024</a></li></ol>
+        </article>
+      </div>
+    </section>
+
+    <section id="stat-reference" class="reference-section">
+      <div class="reference-section-heading"><p class="eyebrow">STATISTICAL ANALYSIS</p><h2>統計解析</h2><p class="reference-note">以下の区分は，結果を読みやすくするための便宜的な目安です．固定的な判定基準ではなく，グラフの水準・傾向・ばらつき，データ数，臨床的な意味と併せて判断してください．</p></div>
+      <div class="reference-list">
+        <article class="card reference-item">
+          <h3>PND</h3>
+          <p class="reference-summary"><strong>何を見る指標か：</strong>ベースライン期で最も介入に有利な値を基準にして，介入期のデータがその基準をどの程度越えたかを割合で示します．</p>
+          <p class="reference-summary"><strong>結果の見方：</strong>値が大きいほど，ベースライン期と重ならない介入期データが多いことを表します．ただし，ベースライン期の極端な1点に結果が左右されやすい指標です．</p>
+          <p class="reference-summary"><strong>効果の目安：</strong>50％未満は「効果なし」，50～69％は「判断保留」，70～89％は「効果あり」，90％以上は「非常に大きい効果」とする区分がよく用いられます．</p>
+          <details class="reference-formula-details"><summary>計算式を表示</summary><div class="formula-block"><span>High values indicate improvement</span><code>PND = #{Bⱼ &gt; max(A)} / nᵦ × 100</code></div></details>
+          <p class="reference-note">このアプリの統計解析では，B期の値がA期より高い方向を正方向として計算します．基準値と同じ値は，基準を越えたデータに含めません．</p>
+          <h4>参考文献</h4>
+          <ol class="citation-list"><li>Scruggs TE, Mastropieri MA, Casto G. The Quantitative Synthesis of Single-Subject Research: Methodology and Validation. <em>Remedial and Special Education</em>. 1987;8(2):24–33. <a href="https://doi.org/10.1177/074193258700800206" target="_blank" rel="noopener noreferrer">doi:10.1177/074193258700800206</a></li><li>Scruggs TE, Mastropieri MA. Summarizing Single-Subject Research: Issues and Applications. <em>Behavior Modification</em>. 1998;22(3):221–242. <a href="https://doi.org/10.1177/01454455980223001" target="_blank" rel="noopener noreferrer">doi:10.1177/01454455980223001</a></li><li>竹林由武．シングルケース実験デザインにおける介入効果の評価．<em>心身医学</em>．2021;61(8):708–714. <a href="https://doi.org/10.15064/jjpm.61.8_708" target="_blank" rel="noopener noreferrer">doi:10.15064/jjpm.61.8_708</a></li></ol>
+        </article>
+
+        <article class="card reference-item">
+          <h3>NAP</h3>
+          <p class="reference-summary"><strong>何を見る指標か：</strong>A期の各データとB期の各データを一つずつ総当たりで比較し，B期の値がA期より高かった組み合わせの多さを表します．</p>
+          <p class="reference-summary"><strong>結果の見方：</strong>0.5付近ではA期とB期に明確な優劣がなく，1に近いほどB期の値が一貫して高く，0に近いほどB期の値が一貫して低いことを示します．同値は半分の得点として扱います．</p>
+          <p class="reference-summary"><strong>効果の目安：</strong>0.50未満はB期が低い方向，0.50は方向差なし，0.50超～0.65は弱い変化，0.66～0.92は中程度，0.93～1.00は強い変化の目安です．</p>
+          <details class="reference-formula-details"><summary>計算式を表示</summary><div class="formula-block"><span>Pair score</span><code>B&gt;A: 1, B=A: 0.5, B&lt;A: 0</code><span>NAP</span><code>NAP = [#{B&gt;A} + 0.5×#{B=A}] / (nₐnᵦ)</code></div></details>
+          <p class="reference-note">標準誤差はSen–Meeの不偏分散推定，信頼区間はNewcombeの方法，P値は同順位を補正したMann–Whitney Uの正規近似を用います．各期内の観測が互いに独立であることを前提とするため，短い時系列では参考値として扱ってください．</p>
+          <h4>参考文献</h4>
+          <ol class="citation-list"><li>Parker RI, Vannest KJ. An Improved Effect Size for Single-Case Research: Nonoverlap of All Pairs. <em>Behavior Therapy</em>. 2009;40(4):357–367. <a href="https://doi.org/10.1016/j.beth.2008.10.006" target="_blank" rel="noopener noreferrer">doi:10.1016/j.beth.2008.10.006</a></li><li>Newcombe RG. Confidence Intervals for an Effect Size Measure Based on the Mann-Whitney Statistic. Part 2: Asymptotic Methods and Evaluation. <em>Statistics in Medicine</em>. 2006;25(4):559–573. <a href="https://doi.org/10.1002/sim.2324" target="_blank" rel="noopener noreferrer">doi:10.1002/sim.2324</a></li><li>竹林由武．シングルケース実験デザインにおける介入効果の評価．<em>心身医学</em>．2021;61(8):708–714. <a href="https://doi.org/10.15064/jjpm.61.8_708" target="_blank" rel="noopener noreferrer">doi:10.15064/jjpm.61.8_708</a></li></ol>
+        </article>
+
+        <article class="card reference-item">
+          <h3>Tau</h3>
+          <p class="reference-summary"><strong>何を見る指標か：</strong>NAPと同じくA期とB期の全組み合わせを比較し，B期が高い組み合わせと低い組み合わせの差を−1から1の範囲で表します．</p>
+          <p class="reference-summary"><strong>結果の見方：</strong>正の値はB期がA期より高い傾向，負の値は低い傾向を示します．0に近い場合は，A期とB期のどちらが高いかが一定していません．</p>
+          <p class="reference-summary"><strong>効果の目安：</strong>符号は変化の方向を表し，正はB期が高い方向，負はB期が低い方向です．大きさは絶対値で確認し，0.20未満は小さい，0.20～0.59は中程度，0.60～0.79は大きい，0.80以上は非常に大きい変化の目安です．</p>
+          <details class="reference-formula-details"><summary>計算式を表示</summary><div class="formula-block"><span>Cross-phase score</span><code>S_AB = #{B&gt;A} − #{B&lt;A}</code><span>Tau</span><code>Tau = S_AB / (nₐnᵦ) = 2×NAP−1</code></div></details>
+          <p class="reference-note">A期とB期で同じ値になった組み合わせは，Sの増減には加えません．標準誤差と信頼区間はNAPの結果をTauの尺度へ変換して求め，P値はMann–Whitney Uの正規近似を用います．</p>
+          <h4>参考文献</h4>
+          <ol class="citation-list"><li>Parker RI, Vannest KJ, Davis JL, Sauber SB. Combining Nonoverlap and Trend for Single-Case Research: Tau-U. <em>Behavior Therapy</em>. 2011;42(2):284–299. <a href="https://doi.org/10.1016/j.beth.2010.08.006" target="_blank" rel="noopener noreferrer">doi:10.1016/j.beth.2010.08.006</a></li><li>Vannest KJ, Ninci J. Evaluating Intervention Effects in Single-Case Research Designs. <em>Journal of Counseling &amp; Development</em>. 2015;93(4):403–411. <a href="https://doi.org/10.1002/jcad.12038" target="_blank" rel="noopener noreferrer">doi:10.1002/jcad.12038</a></li><li>竹林由武．シングルケース実験デザインにおける介入効果の評価．<em>心身医学</em>．2021;61(8):708–714. <a href="https://doi.org/10.15064/jjpm.61.8_708" target="_blank" rel="noopener noreferrer">doi:10.15064/jjpm.61.8_708</a></li></ol>
+        </article>
+
+        <article class="card reference-item">
+          <h3>Tau-U（ベースライン補正）</h3>
+          <p class="reference-summary"><strong>何を見る指標か：</strong>Tauで表したA期とB期の差から，介入前のA期ですでに生じていた時間的な変化を差し引きます．</p>
+          <p class="reference-summary"><strong>結果の見方：</strong>A期が安定していればTauとほぼ同じ値になります．A期ですでにB期と同じ方向へ変化していた場合は，その分を除くため，補正後の値は小さくなります．</p>
+          <p class="reference-summary"><strong>効果の目安：</strong>符号は変化の方向を表し，正はB期が高い方向，負はB期が低い方向です．大きさは絶対値で確認し，0.20未満は小さい，0.20～0.59は中程度，0.60～0.79は大きい，0.80以上は非常に大きい変化の目安です．</p>
+          <details class="reference-formula-details"><summary>計算式を表示</summary><div class="formula-block"><span>Baseline trend score</span><code>S_A = Σ sign(Aⱼ−Aᵢ), i&lt;j</code><span>Tau-U</span><code>Tau-U = (S_AB − S_A) / (nₐnᵦ)</code></div></details>
+          <p class="reference-note">統計解析で「ベースラインで補正する」を選択した場合にTau-Uを算出します．選択しない場合はTauを表示します．Tau-Uの標本分布は十分に確立していないため，信頼区間とP値は原著系のKendall S正規近似による参考値として表示します．補正量によっては計算値が−1～1を超える場合がありますが，値は切り詰めません．</p>
+          <h4>参考文献</h4>
+          <ol class="citation-list"><li>Parker RI, Vannest KJ, Davis JL, Sauber SB. Combining Nonoverlap and Trend for Single-Case Research: Tau-U. <em>Behavior Therapy</em>. 2011;42(2):284–299. <a href="https://doi.org/10.1016/j.beth.2010.08.006" target="_blank" rel="noopener noreferrer">doi:10.1016/j.beth.2010.08.006</a></li><li>Vannest KJ, Ninci J. Evaluating Intervention Effects in Single-Case Research Designs. <em>Journal of Counseling &amp; Development</em>. 2015;93(4):403–411. <a href="https://doi.org/10.1002/jcad.12038" target="_blank" rel="noopener noreferrer">doi:10.1002/jcad.12038</a></li><li>竹林由武．シングルケース実験デザインにおける介入効果の評価．<em>心身医学</em>．2021;61(8):708–714. <a href="https://doi.org/10.15064/jjpm.61.8_708" target="_blank" rel="noopener noreferrer">doi:10.15064/jjpm.61.8_708</a></li><li>山田剛史．シングルケースデザインの統計分析．<em>行動分析学研究</em>．2015;29(Suppl):219–232. <a href="https://doi.org/10.24456/jjba.29.Suppl_219" target="_blank" rel="noopener noreferrer">doi:10.24456/jjba.29.Suppl_219</a></li></ol>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>Version 2.0 · Final audit</footer>
+  <script src="js/navigation.js"></script>
+</body>
+</html>

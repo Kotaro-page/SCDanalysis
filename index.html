@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SCDの視覚分析と非重複指標をブラウザ内で計算する研究者・臨床家向けWebアプリ">
+  <title>SCD Analysis Studio</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-3.7.0.min.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">Single-Case Experimental Design</p>
+      <h1>SCD Analysis Studio</h1>
+    </div>
+    <div class="header-actions">
+      <div class="privacy-badge">Local processing</div>
+      <div class="site-menu">
+        <button id="siteMenuButton" class="hamburger-button" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="siteMenuPanel"><span></span><span></span><span></span></button>
+        <nav id="siteMenuPanel" class="site-menu-panel hidden" aria-label="サイトメニュー">
+          <a class="active" href="index.html">ANALYSIS</a>
+          <a href="reference.html">REFERENCE</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <nav class="analysis-tabs" aria-label="解析機能">
+      <button class="tab active" data-tab="visualPanel" type="button">視覚分析</button>
+      <button class="tab" data-tab="statsPanel" type="button">統計解析</button>
+    </nav>
+
+    <section class="card workflow-card data-workflow-card" aria-labelledby="data-heading">
+      <div class="data-load-row">
+        <div class="data-step-title"><span class="step">STEP 1</span><h2 id="data-heading">データを読み込む</h2></div>
+        <label class="file-drop compact-file-drop">
+          <input id="fileInput" type="file" accept=".csv,.xlsx,.xls">
+          <strong>ExcelまたはCSVを選択</strong>
+          <span>ブラウザ内で処理</span>
+        </label>
+        <label id="sheetControl" class="field sheet-field hidden"><span>使用シートを選択</span>
+          <select id="sheetSelect"></select>
+        </label>
+        <div id="globalStatus" class="status neutral" role="status">ファイル未読込</div>
+      </div>
+      <div id="dataSummary" class="data-summary hidden"></div>
+      <div class="grid-toolbar">
+        <div><strong>データビュー</strong><span id="selectionLabel"> セルをドラッグして範囲選択できます</span></div>
+        <div class="range-box"><label for="directRange">範囲指定</label><input id="directRange" placeholder="例：C2:C6"><button id="applyRangeButton" class="button compact" type="button">選択</button></div>
+      </div>
+      <div class="data-workspace">
+        <div id="dataGridWrap" class="data-grid-wrap" tabindex="0"><div class="empty-state">ファイルを読み込むと，ここにデータ表が表示されます．</div></div>
+        <section id="inlineStatsRegistration" class="inline-registration hidden" aria-labelledby="registration-heading">
+          <div class="inline-registration-heading">
+            <div><span class="step">STEP 2</span><h2 id="registration-heading">解析データを登録する</h2></div>
+            <div id="statsStatus" class="status neutral">設定待ち</div>
+          </div>
+          <p class="guidance compact-guidance">データビューで1列の範囲を選び，登録先のボタンを押してください．範囲の直接入力にも対応しています．</p>
+          <div id="dataSlots" class="slot-grid"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="visualPanel" class="analysis-panel active">
+      <section class="card workflow-card settings-card compact-settings-card visual-settings-card">
+        <div class="section-heading"><div><span class="step">STEP 2</span><h2>視覚分析の設定</h2></div><div id="visualStatus" class="status neutral">設定待ち</div></div>
+        <div class="control-grid four">
+          <label class="field">時間列<select id="timeColumn"></select></label>
+          <label class="field">フェーズ列<select id="phaseColumn"></select></label>
+          <label class="field">データ列<select id="dataColumn"></select></label>
+          <label class="field">解析方法<select id="visualMethod"><option value="ols">Trend（最小二乗法）</option><option value="theil">Trend（Theil–Sen法）</option><option value="twoSD">2SD band法（平均±2SD）</option><option value="celeration">Celeration Line分析</option><option value="vaior">VAIOR（Visual Aid Implying an Objective Rule）</option></select></label>
+          <label id="visualDirectionWrap" class="field hidden">改善方向<select id="visualDirection"><option value="lower">値が低いほど改善</option><option value="higher">値が高いほど改善</option></select></label>
+          <label class="field">表示桁数<input id="visualDigits" type="number" min="0" max="8" value="3"></label>
+        </div>
+        <div id="visualValidation" class="message hidden"></div>
+      </section>
+
+      <section class="result-layout">
+        <article class="card chart-card">
+          <div class="card-title-row"><div><h2>折れ線グラフ</h2><p id="chartCaption">時間列・フェーズ列・データ列を選択してください．</p></div><button id="openDownloadDialogButton" class="button secondary chart-download-button" type="button" aria-label="グラフをダウンロード"><span aria-hidden="true">⇩</span> ダウンロード</button></div>
+          <div id="chart" class="chart"><div class="empty-state">解析設定後にグラフを表示します．</div></div>
+        </article>
+        <aside class="card customization-card customization-panel">
+          <div class="customization-heading">
+            <div><h2>グラフのカスタマイズ</h2><p class="customization-note">変更内容は折れ線グラフへ即時反映されます．</p></div>
+            <label class="collapse-toggle" title="カスタマイズ項目の表示を切り替えます">
+              <span>設定を閉じる</span>
+              <input id="customizationToggle" type="checkbox" checked>
+              <span class="toggle-slider" aria-hidden="true"></span>
+            </label>
+          </div>
+          <div id="customizationBody" class="customization-body">
+          <div class="custom-grid">
+            <div class="custom-group"><h3>データ点・折れ線</h3>
+              <label class="toggle"><input id="showPoints" type="checkbox" checked>プロットを表示</label>
+              <label class="toggle"><input id="showLines" type="checkbox" checked>折れ線を表示</label>
+              <label class="field">プロット形<select id="pointShape"><option value="circle">丸</option><option value="square">四角</option><option value="diamond">ひし形</option><option value="triangle-up">三角</option><option value="x">×</option></select></label>
+              <div class="dual-control"><label>プロットサイズ<input id="pointSizeRange" type="range" min="2" max="18" step="1" value="8"></label><input id="pointSizeNumber" type="number" min="2" max="18" step="1" value="8"></div>
+              <div class="dual-control"><label>折れ線の太さ<input id="lineWidthRange" type="range" min="0.5" max="6" step="0.5" value="2"></label><input id="lineWidthNumber" type="number" min="0.5" max="6" step="0.5" value="2"></div>
+              <div id="phaseColorControls" class="phase-color-controls"></div>
+            </div>
+            <div class="custom-group"><h3>解析線</h3>
+              <label class="toggle"><input id="showTrend" type="checkbox" checked>トレンド線を表示</label>
+              <label class="field inline-color">トレンド線色<input id="trendColor" type="color" value="#2b2b2b"></label>
+              <div class="dual-control"><label>トレンド線の太さ<input id="trendWidthRange" type="range" min="0.5" max="6" step="0.5" value="2"></label><input id="trendWidthNumber" type="number" min="0.5" max="6" step="0.5" value="2"></div>
+              <label class="field">トレンド線種<select id="trendDash"><option value="solid">実線</option><option value="dash">破線</option><option value="dot">点線</option><option value="dashdot">一点鎖線</option></select></label>
+              <label class="toggle"><input id="showBounds" type="checkbox" checked>境界線・変動幅を表示</label>
+              <label class="field inline-color">2SD境界線色<input id="sdColor" type="color" value="#5faf68"></label>
+              <div class="dual-control"><label>2SD線の太さ<input id="sdWidthRange" type="range" min="0.5" max="6" step="0.5" value="1.5"></label><input id="sdWidthNumber" type="number" min="0.5" max="6" step="0.5" value="1.5"></div>
+              <label class="field">2SD線種<select id="sdDash"><option value="dash">破線</option><option value="dot">点線</option><option value="solid">実線</option></select></label>
+              <label class="field inline-color">VAIOR変動幅色<input id="vaiorColor" type="color" value="#93c47d"></label>
+              <div class="dual-control"><label>VAIOR線の太さ<input id="vaiorWidthRange" type="range" min="0.5" max="6" step="0.5" value="1.5"></label><input id="vaiorWidthNumber" type="number" min="0.5" max="6" step="0.5" value="1.5"></div>
+              <label class="field">VAIOR線種<select id="vaiorDash"><option value="dot">点線</option><option value="dash">破線</option><option value="solid">実線</option></select></label>
+            </div>
+            <div class="custom-group"><h3>背景・軸</h3>
+              <label class="toggle"><input id="showPhaseBoundaries" type="checkbox" checked>フェーズ境界線を表示</label>
+              <label class="field inline-color">境界線色<input id="boundaryColor" type="color" value="#aab8ac"></label>
+              <div class="dual-control"><label>境界線の太さ<input id="boundaryWidthRange" type="range" min="0.5" max="5" step="0.5" value="1"></label><input id="boundaryWidthNumber" type="number" min="0.5" max="5" step="0.5" value="1"></div>
+              <label class="field">グラフ内フォント（数字・文字）
+                <select id="chartFont">
+                  <option value="noto-sans">Noto Sans JP</option>
+                  <option value="times-new-roman">Times New Roman</option>
+                  <option value="ms-gothic">MS ゴシック</option>
+                  <option value="ms-mincho">MS 明朝</option>
+                  <option value="meiryo">メイリオ</option>
+                  <option value="yu-gothic">游ゴシック</option>
+                  <option value="yu-mincho">游明朝</option>
+                  <option value="noto-serif">Noto Serif JP</option>
+                  <option value="aptos">Aptos</option>
+                  <option value="calibri">Calibri</option>
+                  <option value="arial">Arial</option>
+                  <option value="helvetica">Helvetica</option>
+                  <option value="segoe-ui">Segoe UI</option>
+                  <option value="cambria">Cambria</option>
+                  <option value="georgia">Georgia</option>
+                  <option value="verdana">Verdana</option>
+                  <option value="courier-new">Courier New</option>
+                </select>
+              </label>
+              <label class="field inline-color">背景色<input id="backgroundColor" type="color" value="#ffffff"></label>
+              <label class="field inline-color">軸線色<input id="axisColor" type="color" value="#415047"></label>
+              <label class="toggle"><input id="showGridLines" type="checkbox" checked>目盛線を表示</label>
+              <label class="field inline-color">目盛線色<input id="gridColor" type="color" value="#dfeadf"></label>
+              <div class="axis-range-grid">
+                <label class="field">縦軸の最小値<input id="yAxisMin" type="number" step="any" placeholder="自動"></label>
+                <label class="field">縦軸の最大値<input id="yAxisMax" type="number" step="any" placeholder="自動"></label>
+                <label class="field">縦軸の目盛間隔<input id="yAxisTick" type="number" min="0" step="any" placeholder="自動"></label>
+              </div>
+              <p class="axis-range-note">空欄の場合は自動設定です．最小値・最大値を指定する場合は両方入力してください．</p>
+              <button id="resetChartButton" class="button secondary" type="button">初期設定に戻す</button>
+            </div>
+          </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="card result-card full-width visual-result-card">
+        <h2>記述統計量・解析結果</h2>
+        <div id="visualResults"><div class="empty-state">解析設定後に結果を表示します．</div></div>
+      </section>
+    </section>
+
+    <section id="statsPanel" class="analysis-panel">
+      <section class="card workflow-card settings-card compact-settings-card stats-settings-card">
+        <div class="section-heading"><div><span class="step">STEP 3</span><h2>統計解析の設定</h2></div></div>
+        <div class="control-grid four">
+          <label class="field">指標<select id="statsMethod"><option value="pnd">PND</option><option value="nap">NAP</option><option value="tauU">Tau／Tau-U</option></select></label>
+          <label class="field">表示桁数<input id="statsDigits" type="number" min="0" max="8" value="3"></label>
+          <label id="tauCorrectionWrap" class="field checkbox-field hidden"><span>ベースライン補正</span><span class="checkbox-line"><input id="tauCorrection" type="checkbox">ベースラインで補正する</span></label>
+        </div>
+        <div class="definition-note" id="statsDefinitionNote"></div>
+      </section>
+
+      <section class="card workflow-card comparison-card">
+        <div class="section-heading"><div><span class="step">STEP 4</span><h2>比較して計算する</h2></div></div>
+        <p class="guidance">比較する2つをチェックしてください．上から先に登録されたデータをベースライン期，次を介入期として扱います．</p>
+        <div id="comparisonChecks" class="comparison-checks"></div>
+        <button id="calculateStatsButton" class="button primary" type="button">計算</button>
+        <div id="statsValidation" class="message hidden"></div>
+      </section>
+
+      <section class="card result-card full-width">
+        <h2>統計解析結果</h2>
+        <div id="statsResults"><div class="empty-state">2つのデータを登録・選択して計算してください．</div></div>
+      </section>
+    </section>
+
+  </main>
+
+  <dialog id="downloadDialog" class="download-dialog" aria-labelledby="downloadDialogTitle">
+    <div class="download-dialog-card">
+      <div class="download-dialog-heading"><div><p class="eyebrow dialog-eyebrow">EXPORT</p><h2 id="downloadDialogTitle">グラフをダウンロード</h2></div><button id="cancelDownloadButton" class="dialog-close" type="button" aria-label="閉じる">×</button></div>
+      <div class="download-form">
+        <label class="field">フォーマット<select id="downloadFormat"><option value="png">PNG</option><option value="jpeg">JPEG</option><option value="webp">WebP</option><option value="svg">SVG</option></select></label>
+        <div class="download-size-row"><label class="field">幅（px）<input id="downloadWidth" type="number" min="100" step="1"></label><label class="field">高さ（px）<input id="downloadHeight" type="number" min="100" step="1"></label></div>
+        <label class="checkbox-line download-aspect"><input id="downloadAspect" type="checkbox" checked>縦横比を維持する</label>
+        <p id="downloadError" class="message error hidden"></p>
+      </div>
+      <div class="download-dialog-actions"><button id="cancelDownloadFooterButton" class="button secondary" type="button">キャンセル</button><button id="confirmDownloadButton" class="button primary" type="button">ダウンロード</button></div>
+    </div>
+  </dialog>
+
+  <footer>Version 1.9 · Separate reference page</footer>
+  <script src="js/navigation.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
